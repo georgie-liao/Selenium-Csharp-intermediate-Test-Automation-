@@ -20,6 +20,8 @@ namespace MarsQA_CompetitionProject.Pages
             PageFactory.InitElements(Global.GlobalDefinitions.driver, this);
         }
 
+        #region  Share Skill web elements
+
         // Verify ShareSkill Button
         [FindsBy(How = How.LinkText, Using = "Share Skill")]
         private IWebElement ShareSkillBtn { get; set; }
@@ -43,6 +45,10 @@ namespace MarsQA_CompetitionProject.Pages
         // Verify Tag textbox
         [FindsBy(How = How.XPath, Using = "//body/div/div/div[@id='service-listing-section']/div[contains(@class,'ui container')]/div[contains(@class,'listing')]/form[contains(@class,'ui form')]/div[contains(@class,'tooltip-target ui grid')]/div[contains(@class,'twelve wide column')]/div[contains(@class,'')]/div[contains(@class,'ReactTags__tags')]/div[contains(@class,'ReactTags__selected')]/div[contains(@class,'ReactTags__tagInput')]/input[1]")]
         private IWebElement TagsTextbox { get; set; }
+
+        // Verify Tag Removal button 
+        [FindsBy(How = How.XPath, Using = "//div[2]/div/form/div[4]/div[2]/div/div/div/span/a")]
+        private IWebElement TagsRemovalBtn { get; set; }
 
         // Verify Service type options
         [FindsBy(How = How.XPath, Using = "//form/div[5]/div[@class='twelve wide column']/div/div[@class='field']")]
@@ -128,13 +134,152 @@ namespace MarsQA_CompetitionProject.Pages
         [FindsBy(How = How.XPath, Using = "//input[@value='Save']")]
         private IWebElement SaveBtn { get; set; }
 
-        //Click on Manage Listings Link
-        [FindsBy(How = How.LinkText, Using = "Manage Listings")]
-        private IWebElement manageListingsBtn { get; set; }
+        #endregion
 
 
-        public void EnterShareSkill()
+        #region  Service type 
+        public void ServiveType() // Select service type
         {
+            // Import data from the excel file
+            String ServiceType = ((GlobalDefinitions.ExcelLib.ReadData(2, "ServiceType")));
+
+            // Select service type
+            if (ServiceType.Equals("Hourly basis service"))
+            {
+                HourlyServiceType.Click();
+            }
+            else if (ServiceType.Equals("One-off service"))
+            {
+                OneOffServiceType.Click();
+            }
+        }
+        #endregion
+
+        #region  Location type 
+        public void LocationType() // Set location typle
+        {
+            // Import data from the excel file
+            String LocationType = ((GlobalDefinitions.ExcelLib.ReadData(2, "LocationType")));
+
+            // Select location type
+            if (LocationType.Equals("On-site"))
+            {
+                OnSiteLocationType.Click();
+            }
+            else if (LocationType.Equals("Online"))
+            {
+                OnlineLocationType.Click();
+            }
+        }
+        #endregion
+
+        #region  Available days, start and end date, start and end time
+        public void AvailableDays() // Set Available days
+        {
+            // Set available days
+            StartDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "StartDate"));
+            EndDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "EndDate"));
+            String[] WeekDays = new String[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+            IList<IWebElement> AvailableCheckboxes = Days.FindElements(By.Name("Available"));
+            String AvailableDaysValue = GlobalDefinitions.ExcelLib.ReadData(2, "SelectDay");
+            IList<String> AvailableDays = AvailableDaysValue.Split(',');
+            for (int i = 0; i < WeekDays.Count(); i++)
+            {
+                if (AvailableDays.Contains(WeekDays[i]))
+                {
+                    AvailableCheckboxes[i].Click();
+                }
+            }
+            
+            // Set Start times
+            IList<IWebElement> AvailableStartTimeInputs = Days.FindElements(By.Name("StartTime"));
+            String AvailableStartTimesValue = GlobalDefinitions.ExcelLib.ReadData(2, "StartingTime");
+            IList<String> AvailableStartTimes = AvailableStartTimesValue.Split(',');
+            for (int i = 0; i < AvailableStartTimes.Count(); i++)
+            {
+                IList<String> startTimeInfo = AvailableStartTimes[i].Split(':');
+                String startTimeDay = startTimeInfo[0];
+                String startTimeValue = startTimeInfo[1];
+                int indexOfDay = Array.IndexOf(WeekDays, startTimeDay);
+                AvailableStartTimeInputs[indexOfDay].SendKeys(startTimeValue);
+            }
+            
+            // Set End time
+            IList<IWebElement> AvailableEndTimeInputs = Days.FindElements(By.Name("EndTime"));
+            String AvailableEndTimesValue = GlobalDefinitions.ExcelLib.ReadData(2, "EndingTime");
+            IList<String> AvailableEndTimes = AvailableEndTimesValue.Split(',');
+            for (int i = 0; i < AvailableEndTimes.Count(); i++)
+            {
+                IList<String> endTimeInfo = AvailableEndTimes[i].Split(':');
+                String endTimeDay = endTimeInfo[0];
+                String endTimeValue = endTimeInfo[1];
+                int indexOfDay = Array.IndexOf(WeekDays, endTimeDay);
+                AvailableEndTimeInputs[indexOfDay].SendKeys(endTimeValue);
+            }
+        }
+        #endregion
+
+        #region  Skill trade type
+        public void SkillTrade() // Set Skill Trade type
+        {
+            // Import data from excel file
+            String SkillTradeType = GlobalDefinitions.ExcelLib.ReadData(2, "SkillTradeType");
+
+            // Select skill trade type 
+            if (SkillTradeType.Equals("Skill-exchange"))
+            {
+                SkillExchange.Click();
+                SkillExchangeTag.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "SkillExchangeTag"));
+                SkillExchangeTag.SendKeys(Keys.Enter);
+            }
+            else if (SkillTradeType.Equals("Credit"))
+            {
+                Credit.Click();
+                CreditAmount.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "CreditAmount"));
+            }
+        }
+        #endregion
+
+        #region Active type
+        public void ActiveType() // Set Active tuype
+        {
+            // Import Status data from excel file
+            String ActiveType = GlobalDefinitions.ExcelLib.ReadData(2, "Status");
+            
+            // Select active type
+            if (ActiveType.Equals("Active"))
+            {
+                ActiveButton.Click();
+            }
+            else if (ActiveType.Equals("Hidden"))
+            {
+                HiddenButton.Click();
+            }
+        }
+        #endregion
+
+        #region Work Sample upload
+        public void WorkSampleUpload() // Upload Work Sample 
+        {
+            // Click on worksample button and upload sample file
+            WorkSampleBtn.Click();
+
+            Thread.Sleep(2000);
+
+            // AutoIt file upload
+            using (Process exeProcess = Process.Start(@"E:\MVP Studio\PROJECTS\MarsQA_CompetitionProject\FileUpload\AutoItFileUpload.exe"))
+            {
+                exeProcess.WaitForExit();
+            }
+           
+            Thread.Sleep(2000);
+        }
+        #endregion
+
+        #region Enter new Share Skill steps
+        public void EnterShareSkill_Steps() // Enter new Share Skill steps
+        {
+
             // Wait for Share Kill button is clickable then click 
             ShareSkillBtn.WaitForElementClickable(GlobalDefinitions.driver, 60);
             ShareSkillBtn.Click();
@@ -153,7 +298,6 @@ namespace MarsQA_CompetitionProject.Pages
             SelectElement selectCategory = new SelectElement(CategoryDropDown);
             selectCategory.SelectByText(GlobalDefinitions.ExcelLib.ReadData(2, "Category"));
 
-
             // Click on subcategory dropdown and select subcategory
             SubCategoryDropDown.Click();
             SelectElement selectSubCategory = new SelectElement(SubCategoryDropDown);
@@ -163,132 +307,31 @@ namespace MarsQA_CompetitionProject.Pages
             TagsTextbox.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Tags"));
             TagsTextbox.SendKeys(Keys.Enter);
 
-            // Select service type
-            String ServiceType = ((GlobalDefinitions.ExcelLib.ReadData(2, "ServiceType")));
-            if (ServiceType.Equals("Hourly basis service"))
-            {
-                HourlyServiceType.Click();
-            }
-            else if (ServiceType.Equals("One-off service"))
-            {
-                OneOffServiceType.Click();
-            }
+            // Select Service Type
+            ServiveType();
 
-            //Select Location Type
-            String LocationType = ((GlobalDefinitions.ExcelLib.ReadData(2, "LocationType")));
-            if (LocationType.Equals("On-site"))
-            {
-                OnSiteLocationType.Click();
-            }
-            else if (LocationType.Equals("Online"))
-            {
-                OnlineLocationType.Click();
-            }
-            StartDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "StartDate"));
-            EndDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "EndDate"));
+            // Select Location Type
+            LocationType();
 
-            // String weekdays
-            String[] WeekDays = new String[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+            // Select Available days
+            AvailableDays();
 
-            // Click weekday checkboxes
-            IList<IWebElement> AvailableCheckboxes = Days.FindElements(By.Name("Available"));
-            String AvailableDaysValue = GlobalDefinitions.ExcelLib.ReadData(2, "SelectDay");
-            IList<String> AvailableDays = AvailableDaysValue.Split(',');
-            for (int i = 0; i < WeekDays.Count(); i++)
-            {
-                if (AvailableDays.Contains(WeekDays[i]))
-                {
-                    AvailableCheckboxes[i].Click();
-                }
-            }
+            // Select Skill Trade type
+            SkillTrade();
 
-            // Set Start times
-            IList<IWebElement> AvailableStartTimeInputs = Days.FindElements(By.Name("StartTime"));
-            String AvailableStartTimesValue = GlobalDefinitions.ExcelLib.ReadData(2, "StartingTime");
-            IList<String> AvailableStartTimes = AvailableStartTimesValue.Split(',');
-            for (int i = 0; i < AvailableStartTimes.Count(); i++)
-            {
-                IList<String> startTimeInfo = AvailableStartTimes[i].Split(':');
-                String startTimeDay = startTimeInfo[0];
-                String startTimeValue = startTimeInfo[1];
-                int indexOfDay = Array.IndexOf(WeekDays, startTimeDay);
-                AvailableStartTimeInputs[indexOfDay].SendKeys(startTimeValue);
-            }
-
-            // Set End time
-            IList<IWebElement> AvailableEndTimeInputs = Days.FindElements(By.Name("EndTime"));
-            String AvailableEndTimesValue = GlobalDefinitions.ExcelLib.ReadData(2, "EndingTime");
-            IList<String> AvailableEndTimes = AvailableEndTimesValue.Split(',');
-            for (int i = 0; i < AvailableEndTimes.Count(); i++)
-            {
-                IList<String> endTimeInfo = AvailableEndTimes[i].Split(':');
-                String endTimeDay = endTimeInfo[0];
-                String endTimeValue = endTimeInfo[1];
-                int indexOfDay = Array.IndexOf(WeekDays, endTimeDay);
-                AvailableEndTimeInputs[indexOfDay].SendKeys(endTimeValue);
-            }
-
-            // Set Skill Trade by entering Skill Exchange Type and credit 
-            String SkillTradeType = GlobalDefinitions.ExcelLib.ReadData(2, "SkillTradeType");
-            if (SkillTradeType.Equals("Skill-exchange"))
-            {
-                SkillExchange.Click();
-                SkillExchangeTag.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "SkillExchangeTag"));
-                SkillExchangeTag.SendKeys(Keys.Enter);
-            }
-            else if (SkillTradeType.Equals("Credit"))
-            {
-                Credit.Click();
-                CreditAmount.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "CreditAmount"));
-            }
-
-            // Click on worksample button and upload sample file
-            WorkSampleBtn.Click();
-            Thread.Sleep(5000);
-            GlobalDefinitions.wait(10);
-            using (Process exeProcess = Process.Start(@"E:\MVP Studio\PROJECTS\MarsQA_CompetitionProject\FileUpload\AutoItFileUpload.exe"))
-            {
-                exeProcess.WaitForExit();
-            }
-            Thread.Sleep(5000);
-            GlobalDefinitions.wait(10);
+            // Upload Work Sample
+            WorkSampleUpload();
 
             // Select Active type
-            String ActiveType = GlobalDefinitions.ExcelLib.ReadData(2, "Status");
-            if (SkillTradeType.Equals("Active"))
-            {
-                ActiveButton.Click();
-            }
-            else if (SkillTradeType.Equals("Hidden"))
-            {
-                HiddenButton.Click();
-            }
+            ActiveType();
 
-            // Click Save button 
-            GlobalDefinitions.wait(10);
+            // Click Save button to save the newly entered Share Skill 
             SaveBtn.Click();
-            Thread.Sleep(5000);
-            Thread.Sleep(5000);
-            // Click Manage listing button to see the record
-            GlobalDefinitions.wait(10);
-            manageListingsBtn.Click();
-            GlobalDefinitions.wait(2);
-            Thread.Sleep(5000);
-            // Assert the the newly created record by comparing the the first record value with the excel data value
-            string searchInput1 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[2]")).Text;
-            Assert.AreEqual(searchInput1, ExcelLib.ReadData(2, "Category"));
-            string searchInput2 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[3]")).Text;
-            Assert.AreEqual(searchInput2, ExcelLib.ReadData(2, "Title"));
-
-            string searchInput3 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[4]")).Text;
-            Assert.AreEqual(searchInput3, ExcelLib.ReadData(2, "Description"));
-            Assert.AreEqual("ListingManagement", GlobalDefinitions.driver.Title);
-
-            Console.WriteLine("Test Passed");
         }
+        #endregion
 
-
-        public void EditShareSkill()
+        #region Edit Share Skill steps
+        public void EditShareSkill_Steps()
         {
             // Import value from excel data file
             GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "EditShareSkill");
@@ -311,22 +354,35 @@ namespace MarsQA_CompetitionProject.Pages
             SelectElement selectSubCategory = new SelectElement(SubCategoryDropDown);
             selectSubCategory.SelectByText(GlobalDefinitions.ExcelLib.ReadData(2, "SubCategory"));
 
-            // Click on Save button to save changes
-            SaveBtn.Click();
+            // Remove existing tag then enter new tage
+            TagsRemovalBtn.Click();
+            TagsTextbox.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Tags"));
+            TagsTextbox.SendKeys(Keys.Enter);
 
-            // Assert the the amended record by comparing the the first record value with the excel data value
+            // Select new Service Type
+            ServiveType();
+
+            // Select new Location Type
+            LocationType();
+
+            // Select new Available days
+            AvailableDays();
+
+            // Select new Skill Trade type
+            SkillTrade();
+
+            // Upload Work Sample
+            WorkSampleUpload();
+
             GlobalDefinitions.wait(10);
-            string searchInput1 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[2]")).Text;
-            Assert.AreEqual(searchInput1, ExcelLib.ReadData(2, "Category"));
-            string searchInput2 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[3]")).Text;
-            Assert.AreEqual(searchInput2, ExcelLib.ReadData(2, "Title"));
 
-            string searchInput3 = GlobalDefinitions.driver.FindElement(By.XPath("/html/body/div/div/div/div[2]/div[1]/div[1]/table/tbody/tr[1]/td[4]")).Text;
-            Assert.AreEqual(searchInput3, ExcelLib.ReadData(2, "Description"));
-            Assert.AreEqual("ListingManagement", GlobalDefinitions.driver.Title);
+            // Select new Active type
+            ActiveType();
 
-            Console.WriteLine("Record Edited Successfully");
+            // Click Save button to save the newly entered Share Skill 
+            SaveBtn.Click();
         }
+        #endregion
     }
 }
 

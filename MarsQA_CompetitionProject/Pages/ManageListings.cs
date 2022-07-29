@@ -10,10 +10,17 @@ namespace MarsQA_CompetitionProject.Pages
 {
     internal class ManageListings
     {
+        #region  Objects 
+        // Edit Share Skill record steps
+        ShareSkill ShareSkillPage = new ShareSkill();
+        #endregion
+
         public ManageListings()
         {
             PageFactory.InitElements(Global.GlobalDefinitions.driver, this);
         }
+
+        #region  Manage Listing web element
 
         // Virify Manage Listing tab
         [FindsBy(How = How.LinkText, Using = "Manage Listings")]
@@ -35,33 +42,49 @@ namespace MarsQA_CompetitionProject.Pages
         [FindsBy(How = How.XPath, Using = "/html/body/div[2]/div/div[3]/button[2]")]
         private IWebElement YesBtn { get; set; }
 
-        internal void Listings()
+        #endregion
+
+
+        #region View Share Skill
+        public void ViewShareSkill_Steps()
         {
-            //Populate the Excel Sheet
-            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ManageListings");
+            // Import value from excel data file
+            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
 
+            // Wait for Manage List tab is clickable then click
+            ManageListingsTab.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
+            ManageListingsTab.Click();
+
+            // Wait for view button is clickable then click
+            ViewIcon.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
+            ViewIcon.Click();
+            GlobalDefinitions.wait(2);
         }
+        #endregion
 
-        public void ManageListingsEditListingSteps()
+
+        #region Edit Share Skill
+        public void EditShareSkill_Action()
         {
             // Wait for Manage List tab is clickable then click
             ManageListingsTab.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
-
             ManageListingsTab.Click();
-            GlobalDefinitions.wait(10);
 
+            GlobalDefinitions.wait(10);
 
             // Click on the Edit icon then edit the record 
             EditIcon.Click();
 
             GlobalDefinitions.wait(10);
 
-            // Edit Share Skill record steps
-            ShareSkill ShareSkillPage = new ShareSkill();
-            ShareSkillPage.EditShareSkill();
+            // Edit Share skill 
+            ShareSkillPage.EditShareSkill_Steps();
         }
+        #endregion
 
-        public void DeleteShareSkill()
+
+        #region Delete Share Skill
+        public void DeleteShareSkill_Steps()
         {
             // Wait for Manage Listings tab is clickable then click
             ManageListingsTab.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
@@ -73,36 +96,10 @@ namespace MarsQA_CompetitionProject.Pages
 
             GlobalDefinitions.wait(2);
 
-            // Switch to Pop-up alert message then click on Yes button
+            // Switch to Pop-up alert message then click on Yes button to confirm deletion
             YesBtn.WaitForElementClickable(GlobalDefinitions.driver, 60);
             YesBtn.Click();
-
-            GlobalDefinitions.wait(2);
-
-            // Assert the pop-message
-            string message = (GlobalDefinitions.driver.FindElement(By.XPath("//div[@class='ns-box ns-growl ns-effect-jelly ns-type-success ns-show']"))).Text;
-            GlobalDefinitions.wait(5);
-            if (message.Contains("has been deleted"))
-            {
-                Console.WriteLine("Test passed");
-            }
-            else
-            {
-                Console.WriteLine("Test failed");
-            }
-
         }
-
-        public void ViewShareSkill()
-        {
-            // Wait for Manage List tab is clickable then click
-            ManageListingsTab.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
-            ManageListingsTab.Click();
-
-            // Wait for view button is clickable then click
-            ViewIcon.WaitForElementClickable(Global.GlobalDefinitions.driver, 60);
-            ViewIcon.Click();
-            GlobalDefinitions.wait(2);
-        }
+        #endregion
     }
 }
