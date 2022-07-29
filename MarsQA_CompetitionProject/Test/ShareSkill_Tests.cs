@@ -1,5 +1,4 @@
-﻿
-using MarsQA_CompetitionProject.Global;
+﻿using MarsQA_CompetitionProject.Global;
 using MarsQA_CompetitionProject.Pages;
 using NUnit.Framework;
 using RelevantCodes.ExtentReports;
@@ -13,10 +12,13 @@ namespace MarsQA_CompetitionProject.Test
 
     public class ShareSkill_Tests
     {
+       
+
         [TestFixture]
         [Category("Sprint1")]
         class User : Global.Base
         {
+
             #region  Test 1 : Create Share Skill
             [Test, Order(1)]
             public void CreateShareSkill()
@@ -104,7 +106,7 @@ namespace MarsQA_CompetitionProject.Test
                 ManageListings ManageListingsObj = new ManageListings();
                 ManageListingsObj.EditShareSkill_Action();
 
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
 
                 // Assert the the edited record by comparing the the record value with the excel data value
                 GlobalDefinitions.wait(10);
